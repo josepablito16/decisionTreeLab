@@ -26,3 +26,27 @@ correlation <- cor(data[,rowNumbers],data$SalePrice,method = c("pearson", "kenda
 # Crear y ordenar tabla
 corrTable <- data.frame(rowNumbers, varNames, correlation)
 corrTableDesc <- corrTable[order(-correlation),]
+
+
+
+#Preguntas
+#¿Cuál es el promedio de chimeneas que tienen las casas más caras?
+mean(head(data[order(data$SalePrice,decreasing = TRUE),c("Fireplaces")], n = 20))
+
+
+#¿En qué intervalo de años han sido construidas las casas más caras?
+table(head(data[order(data$SalePrice,decreasing = TRUE),c("YearBuilt")], n = 20))
+
+#¿Cuál es la cualidad general de las cocinas que tienen las casas más caras?
+table(head(data[order(data$SalePrice,decreasing = TRUE),c("KitchenQual")], n = 20))
+
+
+#¿Cual es el promedio de cuartos que tienen las 20 casas más caras?
+mean(head(data[order(data$SalePrice,decreasing = TRUE),c("BedroomAbvGr")], n = 20))
+
+
+#¿El tamaño del garajes de una casa influye en el precio?
+cor(data$GarageArea,data$SalePrice,method = c("pearson", "kendall", "spearman"))
+
+#¿Cuántas casas tienen piscina?
+nrow(data[data$PoolArea>0,])
