@@ -27,26 +27,32 @@ correlation <- cor(data[,rowNumbers],data$SalePrice,method = c("pearson", "kenda
 corrTable <- data.frame(rowNumbers, varNames, correlation)
 corrTableDesc <- corrTable[order(-correlation),]
 
-
-
 #Preguntas
-#¿Cuál es el promedio de chimeneas que tienen las casas más caras?
+#?Cu?l es el promedio de chimeneas que tienen las casas m?s caras?
 mean(head(data[order(data$SalePrice,decreasing = TRUE),c("Fireplaces")], n = 20))
 
 
-#¿En qué intervalo de años han sido construidas las casas más caras?
+#?En qu? intervalo de a?os han sido construidas las casas m?s caras?
 table(head(data[order(data$SalePrice,decreasing = TRUE),c("YearBuilt")], n = 20))
 
-#¿Cuál es la cualidad general de las cocinas que tienen las casas más caras?
+#?Cu?l es la cualidad general de las cocinas que tienen las casas m?s caras?
 table(head(data[order(data$SalePrice,decreasing = TRUE),c("KitchenQual")], n = 20))
 
 
-#¿Cual es el promedio de cuartos que tienen las 20 casas más caras?
+#?Cual es el promedio de cuartos que tienen las 20 casas m?s caras?
 mean(head(data[order(data$SalePrice,decreasing = TRUE),c("BedroomAbvGr")], n = 20))
 
 
-#¿El tamaño del garajes de una casa influye en el precio?
+#?El tama?o del garajes de una casa influye en el precio?
 cor(data$GarageArea,data$SalePrice,method = c("pearson", "kendall", "spearman"))
 
-#¿Cuántas casas tienen piscina?
+#?Cu?ntas casas tienen piscina?
 nrow(data[data$PoolArea>0,])
+
+# Â¿CuÃ¡l es la capacidad promedio en carros de los garajes de las casas mÃ¡s caras?
+carrosCasasDesc <- data[order(data$SalePrice, decreasing = TRUE),c("GarageCars","SalePrice")]
+mean(carrosCasasDesc[1:50,1])
+
+# Â¿Se asocian ciertas calles a las casas mÃ¡s grandes?
+lotAreaDesc <- data[order(data$LotArea, decreasing = TRUE),c("Neighborhood")]
+table(lotAreaDesc[1:200])
