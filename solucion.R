@@ -11,7 +11,7 @@ str(data)
 rowNumbers <- c()
 varNames <- c()
 
-# Obtener vector de columnas numéricas
+# Obtener vector de columnas num?ricas
 for(name in colnames(data)){
   if(is.numeric(data[1,name]) && name != "Id")
   {
@@ -20,12 +20,9 @@ for(name in colnames(data)){
   }
 }
 
-# Obtener correlación de cada columna en el dataframe
+# Obtener correlaci?n de cada columna en el dataframe
 correlation <- cor(data[,rowNumbers],data$SalePrice,method = c("pearson", "kendall", "spearman"))
 
 # Crear y ordenar tabla
 corrTable <- data.frame(rowNumbers, varNames, correlation)
 corrTableDesc <- corrTable[order(-correlation),]
-
-
-
