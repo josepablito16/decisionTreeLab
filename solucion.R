@@ -7,7 +7,8 @@ data<-read.csv("./Data/train.csv",stringsAsFactors = FALSE)
 summary(data)
 str(data)
 
-# numerics <- c(2,4,5,18,19,20,21,27,35,37,38,39,44,45,46,47,48,49,50,51,52,53,55,57,60,62,63,67,68,69,70,71,72,76,77,78,81)
+#Preguntas
+
 rowNumbers <- c()
 varNames <- c()
 
@@ -20,14 +21,14 @@ for(name in colnames(data)){
   }
 }
 
-# Obtener correlaci?n de cada columna en el dataframe
-correlation <- cor(data[,rowNumbers],data$SalePrice,method = c("pearson", "kendall", "spearman"))
-
 # Crear y ordenar tabla
 corrTable <- data.frame(rowNumbers, varNames, correlation)
 corrTableDesc <- corrTable[order(-correlation),]
 
-#Preguntas
+# Obtener correlaci?n de cada columna en el dataframe
+correlation <- cor(data[,rowNumbers],data$SalePrice,method = c("pearson", "kendall", "spearman"))
+
+
 #?Cu?l es el promedio de chimeneas que tienen las casas m?s caras?
 mean(head(data[order(data$SalePrice,decreasing = TRUE),c("Fireplaces")], n = 20))
 
@@ -56,3 +57,33 @@ mean(carrosCasasDesc[1:50,1])
 # ¿Se asocian ciertas calles a las casas más grandes?
 lotAreaDesc <- data[order(data$LotArea, decreasing = TRUE),c("Neighborhood")]
 table(lotAreaDesc[1:200])
+
+
+
+# Se obtienen los cuartiles de la data
+quantile(data[order(data$SalePrice),"SalePrice"])
+
+  # Del total de los precios, las casas promedio se encuentran entre el 25% y el 75%
+  # del valor más alto. Por ello, Las casas "caras" se toman a partir de 214000 dólares y las
+  # Baratas de 13000 dólares hacia abajo.
+
+# Dataframe del precio de las casas descendiente
+casasPrecioDesc <- data[order(-data$SalePrice),]
+hist(casasPrecioDesc$SalePrice)
+
+ # Casas más caras...
+topCasas <- casasPrecioDesc[1:225,"SalePrice"]
+mean(topCasas)
+hist(topCasas)
+
+  # El promedio de las casas más caras es de 324000 dólares, lo que cumple con el tercer
+  # cuartil obtenido previamente
+
+
+# Casas más baratas...
+bottomCasas <- casasPrecioDesc[1096:1460, "SalePrice"]
+mean(bottomCasas)
+hist(bottomCasas)
+
+  # El promedio de las casas más baratas es de 105831 dólares, lo que cumple con el primer
+  # cuartil obtenido previamente
