@@ -69,6 +69,7 @@ library(NbClust) #Para determinar el numero de clusters optimo
 library(factoextra) #Para hacer gr�ficos bonitos de clustering
 
 #View(data[,c(18,47,62)])
+data2<-data[,c(18,47,62)]
 dataCluster<-data[,c(18,47,62)]
 #Para saber la cantidad de grupos 
 wss <- (nrow(na.omit(dataCluster))-1)*sum(apply(na.omit(dataCluster),2,var))
@@ -84,7 +85,7 @@ hc<-hclust(dist(na.omit(dataCluster))) #Genera el clustering jerárquico de los 
 plot(hc) #Genera el dendograma
 rect.hclust(hc,k=3) #Dibuja el corte de los grupos en el gráfico
 groups<-cutree(hc,k=3) #corta el dendograma, determinando el grupo de cada fila
-#datos$gruposHC<-groups
+data2$gruposHC<-groups
 
 fviz_cluster(list(data = na.omit(dataCluster), cluster = groups))#Grafica
 
@@ -93,8 +94,22 @@ silch<-silhouette(groups,dist(na.omit(dataCluster)))
 mean(silch[,3])
 
 
+#Analisis
+summary(data2[data2$gruposHC==1,])
+hist(data2[data2$gruposHC==1,"OverallQual"])
+hist(data2[data2$gruposHC==1,"GrLivArea"])
+hist(data2[data2$gruposHC==1,"GarageCars"])
+
+summary(data2[data2$gruposHC==2,])
+hist(data2[data2$gruposHC==2,"OverallQual"])
+hist(data2[data2$gruposHC==2,"GrLivArea"])
+hist(data2[data2$gruposHC==2,"GarageCars"])
 
 
+summary(data2[data2$gruposHC==3,])
+hist(data2[data2$gruposHC==3,"OverallQual"])
+hist(data2[data2$gruposHC==3,"GrLivArea"])
+hist(data2[data2$gruposHC==3,"GarageCars"])
 
 
 # Se obtienen los cuartiles de la data
