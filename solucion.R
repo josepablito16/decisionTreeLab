@@ -58,6 +58,43 @@ mean(carrosCasasDesc[1:50,1])
 lotAreaDesc <- data[order(data$LotArea, decreasing = TRUE),c("Neighborhood")]
 table(lotAreaDesc[1:200])
 
+#Agrupamiento de datos
+
+#Usando Metodo k-medias
+library(cluster) #Para calcular la silueta
+library(e1071)#para cmeans
+library(mclust) #mixtures of gaussians
+library(fpc) #para hacer el plotcluster
+library(NbClust) #Para determinar el numero de clusters optimo
+library(factoextra) #Para hacer gr�ficos bonitos de clustering
+
+#View(data[,c(18,47,62)])
+dataCluster<-data[,c(18,47,62)]
+#Para saber la cantidad de grupos 
+wss <- (nrow(na.omit(dataCluster))-1)*sum(apply(na.omit(dataCluster),2,var))
+
+for (i in 2:10) 
+  wss[i] <- sum(kmeans(na.omit(dataCluster), centers=i)$withinss)
+
+plot(1:10, wss, type="b", xlab="Number of Clusters",  ylab="Within groups sum of squares")
+
+
+#Clustering jerarquico
+hc<-hclust(dist(na.omit(dataCluster))) #Genera el clustering jerárquico de los datos
+plot(hc) #Genera el dendograma
+rect.hclust(hc,k=3) #Dibuja el corte de los grupos en el gráfico
+groups<-cutree(hc,k=3) #corta el dendograma, determinando el grupo de cada fila
+#datos$gruposHC<-groups
+
+fviz_cluster(list(data = na.omit(dataCluster), cluster = groups))#Grafica
+
+#Metodo de la silueta para clustering jerárquico
+silch<-silhouette(groups,dist(na.omit(dataCluster)))
+mean(silch[,3])
+
+
+
+
 
 
 # Se obtienen los cuartiles de la data
