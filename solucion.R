@@ -171,15 +171,16 @@ cfm<-table(testSet$prediccion,testSet$gruposHC)
 cfm
 
 
-# INTENTO DE RANDOM FOREST
+# Conjunto de test
+testSet <- data2[1168:1460,]
 
-testCompleto<-read.csv("./Data/test.csv",stringsAsFactors = FALSE)
+# Random forest
+modeloRF1<-randomForest(trainingSet$gruposHC~.,data=trainingSet)
+prediccionRF1<-predict(modeloRF1, newdata = testSet[1:3])
+testCompleto<-testSet
+testCompleto$predRF<-as.integer(prediccionRF1)
 
-# Carga el paquete específico del método Random Forest
-library(randomForest)
+# Resultado final
+cfmRandomForest <- table(testCompleto$predRF, testSet$gruposHC)
+cfmRandomForest
 
-# Ajustar modelo
-modelo <- randomForest(trainingSet$gruposHC~., data=trainingSet)
-
-# Resumen del ajuste del modelo
-modelo
