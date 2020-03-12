@@ -27,7 +27,7 @@ corrTableDesc <- corrTable[order(-correlation),]
 
 # Obtener correlaci?n de cada columna en el dataframe
 correlation <- cor(data[,rowNumbers],data$SalePrice,method = c("pearson", "kendall", "spearman"))
-
+View(corrTableDesc)
 
 #?Cu?l es el promedio de chimeneas que tienen las casas m?s caras?
 mean(head(data[order(data$SalePrice,decreasing = TRUE),c("Fireplaces")], n = 20))
@@ -68,9 +68,9 @@ library(fpc) #para hacer el plotcluster
 library(NbClust) #Para determinar el numero de clusters optimo
 library(factoextra) #Para hacer gr?ficos bonitos de clustering
 
-# View(data[,c(18,47,62,81)])
-data2<-data[,c(18,47,62)]
-dataCluster<-data[,c(18,47,62,81)]
+#View(data[,c(18,47,62,63,81)])
+data2<-data[,c(18,47,62,63)]
+dataCluster<-data[,c(18,47,62,63,81)]
 #Para saber la cantidad de grupos 
 wss <- (nrow(na.omit(dataCluster))-1)*sum(apply(na.omit(dataCluster),2,var))
 
@@ -157,7 +157,7 @@ plot(dt_model);text(dt_model)
 prp(dt_model)
 rpart.plot(dt_model)
 
-prediccion <- predict(dt_model, newdata = testSet[1:3])
+prediccion <- predict(dt_model, newdata = testSet[1:4])
 columnaMasAlta<-apply(prediccion, 1, function(x) colnames(prediccion)[which.max(x)])
 testSet$prediccion<-columnaMasAlta #Se le añade al grupo de prueba el valor de la predicción
 
@@ -169,6 +169,15 @@ dt_model2<-rpart(trainingSet$gruposHC~., trainingSet, method = "anova")
 plot(dt_model2);text(dt_model2)
 prp(dt_model2)
 rpart.plot(dt_model2)
+
+prediccion <- predict(dt_model2, newdata = testSet[1:4])
+prediccion<-as.data.frame(prediccion)
+prediccion[prediccion$prediccion==2.500000,]=3
+
+columnaMasAlta<-round(prediccion,0)
+testSet$prediccion<-columnaMasAlta #Se le añade al grupo de prueba el valor de la predicción
+cfm<-table(testSet[,5],testSet[,6])
+cfm
 
 
 # MODELO CON EL CONJUNTO DE PRUEBA
@@ -191,7 +200,7 @@ for (value in vector) {
 answer$grupoRespuesta <- grupoRespuesta
 
 # Uso de árbol de clasificación con el 70% de los datos como entrenamiento
-prediccion <- predict(dt_model, newdata = test[,colnames(testSet[,1:3])])
+prediccion <- predict(dt_model, newdata = test[,colnames(testSet[,1:4])])
 columnaMasAlta<-apply(prediccion, 1, function(x) colnames(prediccion)[which.max(x)])
 answer$prediccion<-columnaMasAlta #Se le añade al grupo de prueba el valor de la predicción
 
