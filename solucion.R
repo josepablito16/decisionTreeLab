@@ -174,8 +174,9 @@ prediccion <- predict(dt_model2, newdata = testSet[1:4])
 prediccion<-as.data.frame(prediccion)
 prediccion[prediccion$prediccion==2.500000,]=3
 
-columnaMasAlta<-round(prediccion,0)
+columnaMasAlta<-round(as.numeric(prediccion$prediccion),0)
 testSet$prediccion<-columnaMasAlta #Se le añade al grupo de prueba el valor de la predicción
+sapply(testSet,class)
 cfm<-table(testSet[,5],testSet[,6])
 cfm
 
