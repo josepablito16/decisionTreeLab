@@ -66,11 +66,11 @@ library(e1071)#para cmeans
 library(mclust) #mixtures of gaussians
 library(fpc) #para hacer el plotcluster
 library(NbClust) #Para determinar el numero de clusters optimo
-library(factoextra) #Para hacer gr�ficos bonitos de clustering
+library(factoextra) #Para hacer gr?ficos bonitos de clustering
 
-#View(data[,c(18,47,62)])
+# View(data[,c(18,47,62,81)])
 data2<-data[,c(18,47,62)]
-dataCluster<-data[,c(18,47,62)]
+dataCluster<-data[,c(18,47,62,81)]
 #Para saber la cantidad de grupos 
 wss <- (nrow(na.omit(dataCluster))-1)*sum(apply(na.omit(dataCluster),2,var))
 
@@ -105,7 +105,6 @@ hist(data2[data2$gruposHC==2,"OverallQual"])
 hist(data2[data2$gruposHC==2,"GrLivArea"])
 hist(data2[data2$gruposHC==2,"GarageCars"])
 
-
 summary(data2[data2$gruposHC==3,])
 hist(data2[data2$gruposHC==3,"OverallQual"])
 hist(data2[data2$gruposHC==3,"GrLivArea"])
@@ -139,3 +138,48 @@ hist(bottomCasas)
 
   # El promedio de las casas más baratas es de 105831 dólares, lo que cumple con el primer
   # cuartil obtenido previamente
+
+library(rpart)
+library(caret)
+library(tree)
+library(rpart.plot)
+library(randomForest)
+
+
+# Conjunto de entrenamiento
+trainingSet <- data2[1:876,]
+# Conjunto de test
+testSet <- data2[1168:1460,]
+
+# Creacoin del árbol de clasificación en base a los grupos generados por el cluster
+dt_model<-rpart(trainingSet$gruposHC~., trainingSet, method = "class")
+plot(dt_model);text(dt_model)
+prp(dt_model)
+rpart.plot(dt_model)
+
+# Creacoin del árbol de regresión en base a los grupos generados por el cluster
+dt_model2<-rpart(trainingSet$gruposHC~., trainingSet, method = "anova")
+plot(dt_model2);text(dt_model2)
+prp(dt_model2)
+rpart.plot(dt_model2)
+
+prediccion <- predict(dt_model, newdata = testSet)
+columnaMasAlta<-apply(prediccion, 1, function(x) colnames(prediccion)[which.max(x)])
+testSet$prediccion<-columnaMasAlta #Se le añade al grupo de prueba el valor de la predicción
+
+cfm<-table(testSet$prediccion,testSet$gruposHC)
+cfm
+
+
+# INTENTO DE RANDOM FOREST
+
+testCompleto<-read.csv("./Data/test.csv",stringsAsFactors = FALSE)
+
+# Carga el paquete específico del método Random Forest
+library(randomForest)
+
+# Ajustar modelo
+modelo <- randomForest(trainingSet$gruposHC~., data=trainingSet)
+
+# Resumen del ajuste del modelo
+modelo
