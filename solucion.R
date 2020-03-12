@@ -200,21 +200,13 @@ for (value in vector) {
 
 answer$grupoRespuesta <- grupoRespuesta
 
-# Uso de árbol de clasificación con el 70% de los datos como entrenamiento
-prediccion <- predict(dt_model, newdata = test[,colnames(testSet[,1:4])])
-columnaMasAlta<-apply(prediccion, 1, function(x) colnames(prediccion)[which.max(x)])
-answer$prediccion<-columnaMasAlta #Se le añade al grupo de prueba el valor de la predicción
-
-cfm<-table(answer$prediccion, test$grupoRespuesta)
-cfm
-
 
 # Conjunto de test
 testSet <- data2[1168:1460,]
 
 # Random forest
 modeloRF1<-randomForest(trainingSet$gruposHC~.,data=trainingSet)
-prediccionRF1<-predict(modeloRF1, newdata = testSet[1:3])
+prediccionRF1<-predict(modeloRF1, newdata = testSet[1:4])
 testCompleto<-testSet
 testCompleto$predRF<-as.integer(prediccionRF1)
 
