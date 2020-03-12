@@ -151,47 +151,19 @@ trainingSet <- data2[1:876,]
 # Conjunto de test
 testSet <- data2[1168:1460,]
 
-# Creacoin del árbol de clasificación en base a los grupos generados por el cluster
-dt_model<-rpart(trainingSet$gruposHC~., trainingSet, method = "class")
-plot(dt_model);text(dt_model)
-prp(dt_model)
-rpart.plot(dt_model)
-
-prediccion <- predict(dt_model, newdata = testSet[1:4])
-columnaMasAlta<-apply(prediccion, 1, function(x) colnames(prediccion)[which.max(x)])
-testSet$prediccion<-columnaMasAlta #Se le añade al grupo de prueba el valor de la predicción
-
-cfm<-table(testSet$prediccion,testSet$gruposHC)
-cfm
-
-# Creacoin del árbol de regresión en base a los grupos generados por el cluster
-dt_model2<-rpart(trainingSet$gruposHC~., trainingSet, method = "anova")
-plot(dt_model2);text(dt_model2)
-prp(dt_model2)
-rpart.plot(dt_model2)
-
-prediccion <- predict(dt_model2, newdata = testSet[1:4])
-prediccion<-as.data.frame(prediccion)
-prediccion[prediccion$prediccion==2.500000,]=3
-
-columnaMasAlta<-round(as.numeric(prediccion$prediccion),0)
-testSet$prediccion<-columnaMasAlta #Se le añade al grupo de prueba el valor de la predicción
-sapply(testSet,class)
-cfm<-table(testSet[,5],testSet[,6])
-cfm
-
-
 # MODELO CON EL CONJUNTO DE PRUEBA
 test<-read.csv("./Data/test.csv",stringsAsFactors = FALSE)
+test <- test[,c(18,47,62,63)]
 answer <- read.csv("./Data/sample_submission.csv",stringsAsFactors = FALSE)
 
 grupoRespuesta <- c()
+testCompleto<-test
 vector <- answer[,2]
 
 for (value in vector) {
-  if (value <= 34900) {
+  if (value <= 260400) {
     grupoRespuesta <- c(grupoRespuesta, 1)
-  } else if (value >= 538000) {
+  } else if (value >= 410000) {
     grupoRespuesta <- c(grupoRespuesta, 3) 
   } else {
     grupoRespuesta <- c(grupoRespuesta, 2)
@@ -201,15 +173,87 @@ for (value in vector) {
 answer$grupoRespuesta <- grupoRespuesta
 
 
-# Conjunto de test
+# Creacion del árbol de clasificación en base a los grupos generados por el cluster
+dt_model<-rpart(trainingSet$gruposHC~., trainingSet, method = "class")
+plot(dt_model);text(dt_model)
+prp(dt_model)
+rpart.plot(dt_model)
+
+# PREDICCION AD SOBRE CV
+prediccion <- predict(dt_model, newdata = testSet[1:4])
+columnaMasAlta<-apply(prediccion, 1, function(x) colnames(prediccion)[which.max(x)])
+testCompleto <- testSet
+testCompleto$prediccion<-columnaMasAlta #Se le añade al grupo de prueba el valor de la predicción
+
+cfm<-table(testCompleto$prediccion,testCompleto$gruposHC)
+cfm
+
+# PREDICCION AD SOBRE CSV
+prediccion <- predict(dt_model, newdata = test[1:4])
+columnaMasAlta<-apply(prediccion, 1, function(x) colnames(prediccion)[which.max(x)])
+testCompleto <- test
+testCompleto$prediccion<-columnaMasAlta #Se le añade al grupo de prueba el valor de la predicción
+
+cfm<-table(testCompleto$prediccion,answer$grupoRespuesta)
+cfm
+
+
+
+# Creacion del árbol de regresión en base a los grupos generados por el cluster
+dt_model2<-rpart(trainingSet$gruposHC~., trainingSet, method = "anova")
+plot(dt_model2);text(dt_model2)
+prp(dt_model2)
+rpart.plot(dt_model2)
+
+
+# PREDICCIÓN SOBRE CV
+prediccion <- predict(dt_model2, newdata = testSet[1:4])
+prediccion<-as.data.frame(prediccion)
+prediccion[prediccion$prediccion==2.500000,]=3
+
+columnaMasAlta<-round(as.numeric(prediccion$prediccion),0)
+testCompleto$prediccion<-columnaMasAlta #Se le añade al grupo de prueba el valor de la predicción
+sapply(testSet,class)
+cfm<-table(testSet[,5],testSet[,6])
+cfm
+
+# PREDICCION SOBRE CSV
+prediccion <- predict(dt_model2, newdata = test[1:4])
+prediccion<-as.data.frame(prediccion)
+prediccion[prediccion$prediccion==2.500000,]=3
+
+columnaMasAlta<-round(as.numeric(prediccion$prediccion),0)
+testCompleto <- test
+testCompleto$prediccion<-columnaMasAlta #Se le añade al grupo de prueba el valor de la predicción
+sapply(testCompleto,class)
+cfm<-table(answer$grupoRespuesta, testCompleto$prediccion)
+cfm
+
+
+
+test <- test[,c(18,47,62,63)]
+
+# PREDICCION DE RF SOBRE CV
 testSet <- data2[1168:1460,]
 
 # Random forest
 modeloRF1<-randomForest(trainingSet$gruposHC~.,data=trainingSet)
 prediccionRF1<-predict(modeloRF1, newdata = testSet[1:4])
 testCompleto<-testSet
-testCompleto$predRF<-as.integer(prediccionRF1)
+testCompleto$predRF<-round(prediccionRF1)
 
 # Resultado final
 cfmRandomForest <- table(testCompleto$predRF, testSet$gruposHC)
 cfmRandomForest
+
+
+# PREDICCION RF SOBRE EL TEST CSV
+modeloRF1<-randomForest(trainingSet$gruposHC~.,data=trainingSet)
+prediccionRF1<-predict(modeloRF1, newdata = test[1:4])
+testCompleto<-test
+testCompleto$predRF<-round(prediccionRF1)
+
+# Resultado final
+cfmRandomForest <- table(answer$grupoRespuesta, testCompleto$predRF)
+cfmRandomForest
+
