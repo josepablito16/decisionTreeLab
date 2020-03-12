@@ -157,17 +157,45 @@ plot(dt_model);text(dt_model)
 prp(dt_model)
 rpart.plot(dt_model)
 
+prediccion <- predict(dt_model, newdata = testSet[1:3])
+columnaMasAlta<-apply(prediccion, 1, function(x) colnames(prediccion)[which.max(x)])
+testSet$prediccion<-columnaMasAlta #Se le añade al grupo de prueba el valor de la predicción
+
+cfm<-table(testSet$prediccion,testSet$gruposHC)
+cfm
+
 # Creacoin del árbol de regresión en base a los grupos generados por el cluster
 dt_model2<-rpart(trainingSet$gruposHC~., trainingSet, method = "anova")
 plot(dt_model2);text(dt_model2)
 prp(dt_model2)
 rpart.plot(dt_model2)
 
-prediccion <- predict(dt_model, newdata = testSet[1:3])
-columnaMasAlta<-apply(prediccion, 1, function(x) colnames(prediccion)[which.max(x)])
-testSet$prediccion<-columnaMasAlta #Se le añade al grupo de prueba el valor de la predicción
 
-cfm<-table(testSet$prediccion,testSet$gruposHC)
+# MODELO CON EL CONJUNTO DE PRUEBA
+test<-read.csv("./Data/test.csv",stringsAsFactors = FALSE)
+answer <- read.csv("./Data/sample_submission.csv",stringsAsFactors = FALSE)
+
+grupoRespuesta <- c()
+vector <- answer[,2]
+
+for (value in vector) {
+  if (value <= 34900) {
+    grupoRespuesta <- c(grupoRespuesta, 1)
+  } else if (value >= 538000) {
+    grupoRespuesta <- c(grupoRespuesta, 3) 
+  } else {
+    grupoRespuesta <- c(grupoRespuesta, 2)
+  }
+}
+
+answer$grupoRespuesta <- grupoRespuesta
+
+# Uso de árbol de clasificación con el 70% de los datos como entrenamiento
+prediccion <- predict(dt_model, newdata = test[,colnames(testSet[,1:3])])
+columnaMasAlta<-apply(prediccion, 1, function(x) colnames(prediccion)[which.max(x)])
+answer$prediccion<-columnaMasAlta #Se le añade al grupo de prueba el valor de la predicción
+
+cfm<-table(answer$prediccion, test$grupoRespuesta)
 cfm
 
 
@@ -183,4 +211,3 @@ testCompleto$predRF<-as.integer(prediccionRF1)
 # Resultado final
 cfmRandomForest <- table(testCompleto$predRF, testSet$gruposHC)
 cfmRandomForest
-
