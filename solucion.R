@@ -163,7 +163,7 @@ plot(dt_model2);text(dt_model2)
 prp(dt_model2)
 rpart.plot(dt_model2)
 
-prediccion <- predict(dt_model, newdata = testSet)
+prediccion <- predict(dt_model, newdata = testSet[1:3])
 columnaMasAlta<-apply(prediccion, 1, function(x) colnames(prediccion)[which.max(x)])
 testSet$prediccion<-columnaMasAlta #Se le añade al grupo de prueba el valor de la predicción
 
