@@ -200,7 +200,11 @@ cfm
 
 
 # Creacion del árbol de regresión en base a los grupos generados por el cluster
-dt_model2<-rpart(trainingSet$gruposHC~., trainingSet, method = "anova")
+trainingSetConPrecios <- trainingSet[1:4]
+trainingSetConPrecios$SalePrice <- data[1:876,81]
+
+# Entrenar a los datos en base al precio
+dt_model2<-rpart(trainingSetConPrecios$SalePrice~., trainingSetConPrecios, method = "anova")
 plot(dt_model2);text(dt_model2)
 prp(dt_model2)
 rpart.plot(dt_model2)
@@ -208,27 +212,24 @@ rpart.plot(dt_model2)
 
 # PREDICCIÓN SOBRE CV
 prediccion <- predict(dt_model2, newdata = testSet[1:4])
-prediccion<-as.data.frame(prediccion)
-prediccion[prediccion$prediccion==2.500000,]=3
+testCompleto <- testSet[1:4]
+testCompleto$prediccion<-prediccion #Se le añade al grupo de prueba el valor de la predicción
+testCompleto$ValorReal<-data[1168:1460,81]
 
-columnaMasAlta<-round(as.numeric(prediccion$prediccion),0)
-testCompleto$prediccion<-columnaMasAlta #Se le añade al grupo de prueba el valor de la predicción
-sapply(testSet,class)
-cfm<-table(testSet[,5],testSet[,6])
-cfm
+# TODO:
+  # Ya con prediccion y valor real, hacer gráfico de scatter y rmsel para discutir porcentaje de error
+  # y que tan bien se entrenó al modelo.
+
 
 # PREDICCION SOBRE CSV
 prediccion <- predict(dt_model2, newdata = test[1:4])
-prediccion<-as.data.frame(prediccion)
-prediccion[prediccion$prediccion==2.500000,]=3
-
-columnaMasAlta<-round(as.numeric(prediccion$prediccion),0)
 testCompleto <- test
-testCompleto$prediccion<-columnaMasAlta #Se le añade al grupo de prueba el valor de la predicción
-sapply(testCompleto,class)
-cfm<-table(answer$grupoRespuesta, testCompleto$prediccion)
-cfm
+testCompleto$prediccion<-prediccion #Se le añade al grupo de prueba el valor de la predicción
+testCompleto$respuesta<-answer$SalePrice
 
+# TODO:
+# Ya con prediccion y valor real, hacer gráfico de scatter y rmsel para discutir porcentaje de error
+# y que tan bien se entrenó al modelo.
 
 
 test <- test[,c(18,47,62,63)]
@@ -240,20 +241,19 @@ testSet <- data2[1168:1460,]
 modeloRF1<-randomForest(trainingSet$gruposHC~.,data=trainingSet)
 prediccionRF1<-predict(modeloRF1, newdata = testSet[1:4])
 testCompleto<-testSet
-testCompleto$predRF<-round(prediccionRF1)
+testCompleto$predRF<-prediccionRF1
 
-# Resultado final
-cfmRandomForest <- table(testCompleto$predRF, testSet$gruposHC)
-cfmRandomForest
+# POR HACER..!
+# testCompleto$respuesta <-
+
 
 
 # PREDICCION RF SOBRE EL TEST CSV
 modeloRF1<-randomForest(trainingSet$gruposHC~.,data=trainingSet)
 prediccionRF1<-predict(modeloRF1, newdata = test[1:4])
 testCompleto<-test
-testCompleto$predRF<-round(prediccionRF1)
+testCompleto$predRF<-prediccionRF1
 
 # Resultado final
-cfmRandomForest <- table(answer$grupoRespuesta, testCompleto$predRF)
-cfmRandomForest
+# Comparar precio real vs prediccion
 
