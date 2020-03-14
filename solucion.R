@@ -249,8 +249,15 @@ testSet <- data2[1168:1460,]
 # Random forest
 modeloRF1<-randomForest(trainingSetConPrecios$SalePrice~.,data=trainingSetConPrecios)
 prediccionRF1<-predict(modeloRF1, newdata = testSet[1:4])
-testCompleto$ValorReal<-data2[1168:1460,81]
+testCompleto$ValorReal<-data[1168:1460,81]
 testCompleto$predRF<-prediccionRF1
+
+
+errorProm<-0
+for (i in 1:length(testCompleto) ) {
+  errorProm<-errorProm + ((abs(testCompleto$predRF[i]-testCompleto$ValorReal[i])*100)/testCompleto$ValorReal[i])
+}
+errorProm<-errorProm/length(testCompleto)
 
 # POR HACER..!
 # testCompleto$respuesta <-
@@ -258,10 +265,16 @@ testCompleto$predRF<-prediccionRF1
 
 
 # PREDICCION RF SOBRE EL TEST CSV
-modeloRF1<-randomForest(trainingSet$gruposHC~.,data=trainingSet)
 prediccionRF1<-predict(modeloRF1, newdata = test[1:4])
-testCompleto$ValorReal<-data[1168:1460,81]
-testCompleto$predRF<-prediccionRF1
+testCompleto <- test
+testCompleto$prediccion2<-prediccionRF1 
+testCompleto$respuesta2<-answer$SalePrice
+
+errorProm<-0
+for (i in 1:length(testCompleto) ) {
+  errorProm<-errorProm + ((abs(testCompleto$prediccion2[i]-testCompleto$respuesta2[i])*100)/testCompleto$respuesta2[i])
+}
+errorProm<-errorProm/length(testCompleto)
 
 # Resultado final
 # Comparar precio real vs prediccion
