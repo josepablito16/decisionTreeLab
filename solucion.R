@@ -211,14 +211,19 @@ rpart.plot(dt_model2)
 
 
 # PREDICCIÓN SOBRE CV
+
+
 prediccion <- predict(dt_model2, newdata = testSet[1:4])
 testCompleto <- testSet[1:4]
 testCompleto$prediccion<-prediccion #Se le añade al grupo de prueba el valor de la predicción
 testCompleto$ValorReal<-data[1168:1460,81]
 
-# TODO:
-  # Ya con prediccion y valor real, hacer gráfico de scatter y rmsel para discutir porcentaje de error
-  # y que tan bien se entrenó al modelo.
+#Verificamos el error promedio para ver el rendimiento
+errorProm<-0
+for (i in 1:length(testCompleto) ) {
+  errorProm<-errorProm + ((abs(testCompleto$prediccion[i]-testCompleto$ValorReal[i])*100)/testCompleto$ValorReal[i])
+}
+errorProm<-errorProm/length(testCompleto)
 
 
 # PREDICCION SOBRE CSV
@@ -227,20 +232,24 @@ testCompleto <- test
 testCompleto$prediccion<-prediccion #Se le añade al grupo de prueba el valor de la predicción
 testCompleto$respuesta<-answer$SalePrice
 
-# TODO:
-# Ya con prediccion y valor real, hacer gráfico de scatter y rmsel para discutir porcentaje de error
-# y que tan bien se entrenó al modelo.
+#Verificamos el error promedio para ver el rendimiento
+errorProm<-0
+for (i in 1:length(testCompleto) ) {
+  errorProm<-errorProm + ((abs(testCompleto$prediccion[i]-testCompleto$respuesta[i])*100)/testCompleto$respuesta[i])
+}
+errorProm<-errorProm/length(testCompleto)
+
 
 
 test <- test[,c(18,47,62,63)]
-
+#############################################################################################################################
 # PREDICCION DE RF SOBRE CV
 testSet <- data2[1168:1460,]
 
 # Random forest
-modeloRF1<-randomForest(trainingSet$gruposHC~.,data=trainingSet)
+modeloRF1<-randomForest(trainingSetConPrecios$SalePrice~.,data=trainingSetConPrecios)
 prediccionRF1<-predict(modeloRF1, newdata = testSet[1:4])
-testCompleto<-testSet
+testCompleto$ValorReal<-data2[1168:1460,81]
 testCompleto$predRF<-prediccionRF1
 
 # POR HACER..!
@@ -251,9 +260,9 @@ testCompleto$predRF<-prediccionRF1
 # PREDICCION RF SOBRE EL TEST CSV
 modeloRF1<-randomForest(trainingSet$gruposHC~.,data=trainingSet)
 prediccionRF1<-predict(modeloRF1, newdata = test[1:4])
-testCompleto<-test
+testCompleto$ValorReal<-data[1168:1460,81]
 testCompleto$predRF<-prediccionRF1
 
 # Resultado final
 # Comparar precio real vs prediccion
-
+################################################################################################################################
